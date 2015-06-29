@@ -43,15 +43,15 @@
 byte mac[] = { 0xD4, 0x28, 0xB2, 0xFF, 0xA0, 0xA1 }; // Must be unique on local network
 
 // for static IP users.
-IPAddress ip(222, 98, 173, 232);
-IPAddress gateway(222, 98, 173, 254);
-IPAddress subnet(255, 255, 255, 192);
+IPAddress ip(111, 111, 111, 111);
+IPAddress gateway(222, 222, 222, 1);
+IPAddress subnet(255, 255, 255, 0);
 // fill in your Domain Name Server address here:
 IPAddress myDns(8, 8, 8, 8); // google puble dns
 
 // ThingSpeak Settings
 char thingSpeakAddress[] = "api.thingspeak.com";
-String thingtweetAPIKey = "V4VFDWX6LNWOU08H";
+String thingtweetAPIKey = "XXXXXXX6LNWOU08H";
 
 // Variable Setup
 long lastConnectionTime = 0; 
