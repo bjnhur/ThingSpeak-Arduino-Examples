@@ -32,7 +32,9 @@
  
  Additional Credits:
  Example sketches from Arduino team, Ethernet by Adrian McEwen
- 
+
+ Updated: June 29, 2015 by Bongjun Hur
+ changed some code for new WIZnet W5500 Ethernet Shield. 
 */
 
 #include <SPI.h>
@@ -41,9 +43,16 @@
 // Local Network Settings
 byte mac[] = { 0xD4, 0x28, 0xB2, 0xFF, 0xA0, 0xA1 }; // Must be unique on local network
 
+// for static IP users.
+IPAddress ip(222, 98, 173, 232);
+IPAddress gateway(222, 98, 173, 254);
+IPAddress subnet(255, 255, 255, 192);
+// fill in your Domain Name Server address here:
+IPAddress myDns(8, 8, 8, 8); // google puble dns
+
 // ThingSpeak Settings
 char thingSpeakAddress[] = "api.thingspeak.com";
-String writeAPIKey = "XXXMX2WYYR0EVZZZ";
+String writeAPIKey = "9H6UUYP84BV5FYJ8";
 const int updateThingSpeakInterval = 16 * 1000;      // Time interval in milliseconds to update ThingSpeak (number of seconds * 1000 = interval)
 
 // Variable Setup
@@ -53,6 +62,10 @@ int failedCounter = 0;
 
 // Initialize Arduino Ethernet Client
 EthernetClient client;
+
+// error at 1.6.4 IDE, so add declaration of function. 
+void startEthernet();
+void updateThingSpeak(String tsData);
 
 void setup()
 {
@@ -142,7 +155,6 @@ void updateThingSpeak(String tsData)
 
 void startEthernet()
 {
-  
   client.stop();
 
   Serial.println("Connecting Arduino to network...");
@@ -151,7 +163,13 @@ void startEthernet()
   delay(1000);
   
   // Connect to network amd obtain an IP address using DHCP
+  // initialize the ethernet device
+#if defined __USE_DHCP__
+#if defined(WIZ550io_WITH_MACADDRESS) // Use assigned MAC address of WIZ550io
+  if (Ethernet.begin() == 0)
+#else
   if (Ethernet.begin(mac) == 0)
+#endif  
   {
     Serial.println("DHCP Failed, reset Arduino to try again");
     Serial.println();
@@ -161,6 +179,15 @@ void startEthernet()
     Serial.println("Arduino connected to network using DHCP");
     Serial.println();
   }
-  
+#else
+#if defined(WIZ550io_WITH_MACADDRESS) // Use assigned MAC address of WIZ550io
+  Ethernet.begin(ip, myDns, gateway, subnet);
+#else
+  Ethernet.begin(mac, ip, myDns, gateway, subnet);
+#endif  
+    Serial.println("Arduino connected to network using Static IP : ");
+    Serial.println(Ethernet.localIP());
+#endif   
+
   delay(1000);
 }
